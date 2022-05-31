@@ -1,0 +1,148 @@
+import numpy as np
+import pandas as pd
+import matplotlibas plt
+import seaborn as sns
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+from sklearn.model_selection import train_test_split
+
+train=pd.read_csv("")
+test=pd.read_csv("")
+ss=pd.read_csv("")
+
+train.shape
+test.shape
+ 
+//to look at data
+train.head()
+
+//concatinating train and test data
+data=pd.concat([train,test])
+data.drop("Loan_ID",axis=1,inplace=True)
+
+//to identify missing values
+data.isnull().sum()
+
+for i in [data]:
+i["Gender"]=i["Gender"].fillna(data.Gender.dropna().mode()[0])
+i["Married"]=i["Married"].fillna(data.Married.dropna().mode()[0])
+i["Dependents"]=i["Dependents"].fillna(data.Dependents.dropna().mode()[0])
+i["Self_employed"]=i["Self_Employed"].fillna(data.Self_Employed.dropna().mode()[0])
+i["Credit_History"]=i["Credit_History"].fillna(data.Credit_History.dropna().mode()[0])
+ i["LoanAmount"]=i["LoanAmount"].fillna(data.LoanAmount.dropna().mode()[0])
+ i["Loan_Amount_Term"]=i["Loan_Amount_Term"].fillna(data.LoanAmount.dropna().mode()[0])
+      
+
+//filling null values with mode:
+
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+from sklearn.ensemble import RandomForestRegressor
+data1=data.loc[:,['LoanAmount','Loan_Amount_Term']]
+
+//running imputer with randomforest estimator:
+imp=IterativeImputer(RandomForestRegression(),max_iter=10,random_state=0)
+data1=pd.DataFrame(imp.fit_transform(data1),columns=data1.columns)
+
+// mapping missing values variables with integer
+gender_stat = {"Female": 0, "Male": 1}
+yes_no_stat = {'No' : 0,'Yes' : 1}
+dependents_stat = {'0':0,'1':1,'2':2,'3+':3}
+education_stat = {'Not Graduate' : 0, 'Graduate' : 1}
+property_stat = {'Semiurban' : 0, 'Urban' : 1,'Rural' : 2}
+
+data['Gender'] = data['Gender'].replace(gender_stat)
+data['Married'] = data['Married'].replace(yes_no_stat)
+data['Dependents'] = data['Dependents'].replace(dependents_stat)
+data['Education'] = data['Education'].replace(education_stat)
+data['Self_Employed'] = data['Self_Employed'].replace(yes_no_stat)
+data['Property_Area'] = data['Property_Area'].replace(property_stat)
+
+//splitting data into to two test and train:
+new_train=data.iloc[:614]
+new_test=data.iloc[614:]
+
+new_train["Loan_Status"]=new_train["Loan_status"].map({"N":0,"Y":1}).astype(int)
+
+//Univariate analysis
+plt.figure(figsize=(20,15))
+plt.subplot(2,4,1)
+sns.countplot('Loan_Status',data=new_train)
+plt.subplot(2,4,2)
+sns.countplot('Gender',data=new_train)
+plt.subplot(2,4,3)
+sns.countplot('Married',data=new_train)
+plt.subplot(2,4,4)
+sns.countplot('Education',data=new_train)
+plt.subplot(2,4,5)
+sns.countplot('Self_Employed',data=new_train)
+plt.subplot(2,4,6)
+sns.countplot('Property_Area',data=new_train)
+plt.subplot(2,4,7)
+sns.countplot('Credit_History',data=new_train)
+
+
+//Biavariate Analysis:
+sns.boxplot(x='Loan_Status',y='ApplicantIncome',data=new_train)
+sns.boxplot(x='Gender',y='LoanAmount',data=new_train)
+
+//the mean value of loan amount applied by males is higher than femlaes:
+sns.catplot(x='Gender',y='LoanAmount',data=data,kind='box',hue='Loan_Status',col='Married')
+
+//if you are married then loan amoutn req is higher then non-married:
+sns.catplot(x='Gender',y='CoapplicantIncome',data=data,kind='boxen',hue='Loan_Status',col='Property_Area')
+
+//correlation mattrix:
+plt.figure(figsize=(10,10))
+correlation_matrix=new_train.corr()
+sns.heatmap(correlation_matrix,annot=True)
+plt.show
+
+//MLM:
+x=new_train.drop("Loan_Status",axis=1)
+y=new_train["Loan_Status"]
+
+from sklearn.model.selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=.3)
+x_train_shape
+
+//using logisticRegression:
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+log_clf=LogisticRegression()
+from sklearn.model_selection import cross_val_score
+cross_val_score(log_clf,x_train,y_train,cv=3)
+predo=log_clf.fit(x_train,y_train).predict(x_test)
+accuracy_score(predo,y_test)
+
+//after accuracy we use grid to finetune:
+from sklearn.model_selection import GridSearchCV
+LRparam_grid={
+         'c':[0.1,1,10,100,1000,10000],
+          'penalty':['l1','l2'],
+          'max_iter':list(range(100,800,100)),
+          'solver':['newton-cg','lbfgs','liblinear','sag']
+}
+ Lr_search=GridSearchCV(LogisticRegression(), Lrparam_grid,refit=true,verbose=3,cv=5)
+LR_search.fit(x_train,y_train)
+LR_search.best_params_
+
+//last prediction
+l=LR_search.predict(x_test)
+accuracy_score(l,y_test)
+
+
+import seaborn as sns
+
+sns.set(style="ticks", color_codes=True)
+g = sns.pairplot(new_train)
+
+
+import matplotlib.pyplot as plt
+plt.show()
+
+
+ 
+
